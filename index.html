@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perivale Warehouse — Process map</title>
+<style>
+/* Industry — design-system tokens and component classes. This file is the source of truth for the system's look; retune it here and see readme.md. */
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&display=swap');
+
+:root {
+  --color-bg: #f2f2f3;
+  --color-surface: #e9e9ea;
+  --color-text: #1d1f20;
+  --color-accent: #5980a6;
+  --color-accent-2: #728fab;
+  --color-divider: color-mix(in srgb, #1d1f20 16%, transparent);
+
+  /* Tonal ramps — generated in OKLCH on one shared lightness scale, so the
+     same step of any role matches the others in visual value. */
+  --color-neutral-100: #f5f5f8;
+  --color-neutral-200: #e7e7ea;
+  --color-neutral-300: #d4d4d7;
+  --color-neutral-400: #b7b7ba;
+  --color-neutral-500: #98989b;
+  --color-neutral-600: #7a7a7d;
+  --color-neutral-700: #5d5d60;
+  --color-neutral-800: #424244;
+  --color-neutral-900: #2b2b2d;
+
+  --color-accent-100: #eef6ff;
+  --color-accent-200: #d6ebff;
+  --color-accent-300: #b5d9fd;
+  --color-accent-400: #94bce3;
+  --color-accent-500: #749dc4;
+  --color-accent-600: #597ea3;
+  --color-accent-700: #416180;
+  --color-accent-800: #2c455d;
+  --color-accent-900: #1d2d3d;
+
+  --color-accent-2-100: #eef6ff;
+  --color-accent-2-200: #d6ebff;
+  --color-accent-2-300: #bdd8f2;
+  --color-accent-2-400: #9ebbd8;
+  --color-accent-2-500: #7e9cb8;
+  --color-accent-2-600: #627d98;
+  --color-accent-2-700: #486077;
+  --color-accent-2-800: #314457;
+  --color-accent-2-900: #1f2d3a;
+
+  --font-heading: "Barlow Condensed", system-ui, sans-serif;
+  --font-heading-weight: 600;
+  --font-body: "Barlow", system-ui, sans-serif;
+
+  --space-1: 3.4px;
+  --space-2: 6.8px;
+  --space-3: 10.2px;
+  --space-4: 13.6px;
+  --space-6: 20.4px;
+  --space-8: 27.2px;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 7px;
+
+  /* Elevation — derived from the ground: soft ink-tinted shadows on a
+     light theme, a hairline edge + ambient darkness on a dark one. */
+  --shadow-sm: 0 1px 2px color-mix(in srgb, #2b2b2d 14%, transparent);
+  --shadow-md: 0 3px 10px color-mix(in srgb, #2b2b2d 16%, transparent);
+  --shadow-lg: 0 12px 32px color-mix(in srgb, #2b2b2d 22%, transparent);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); }
+
+.blueprint {
+  position: relative;
+  border: 1px solid var(--color-divider);
+  border-radius: 0;
+}
+/* The overlay image treatments (halftone, duotone) clip their overlay
+   (overflow:hidden); a blueprint wrapper draws its registration marks
+   outside the box, so when both classes share a wrapper the frame must
+   win. */
+.blueprint.halftone, .blueprint.plate, .blueprint.duotone { overflow: visible; }
+.blueprint > .corner {
+  position: absolute; width: 11px; height: 11px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+.blueprint > .corner::before, .blueprint > .corner::after {
+  content: ""; position: absolute; background: currentColor;
+}
+.blueprint > .corner::before { left: 5px; top: 0; width: 1px; height: 100%; }
+.blueprint > .corner::after  { top: 5px; left: 0; width: 100%; height: 1px; }
+.blueprint > .corner.tl { top: -6px; left: -6px; }
+.blueprint > .corner.tr { top: -6px; right: -6px; }
+.blueprint > .corner.bl { bottom: -6px; left: -6px; }
+.blueprint > .corner.br { bottom: -6px; right: -6px; }
+
+.duotone{position:relative;overflow:hidden}
+.duotone::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:var(--color-accent);mix-blend-mode:color}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Components — built with the tokens above. Plain CSS
+   on plain HTML: no JavaScript, no build step. Each class is documented in
+   readme.md and demonstrated in foundations/ and components/.
+   ══════════════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-size: 15px; line-height: 1.55; font-weight: 400; }
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  line-height: 1.12; letter-spacing: -0.015em; margin: 0 0 var(--space-2);
+}
+h1 { font-size: 42px; }
+h2 { font-size: 32px; }
+h3 { font-size: 25px; }
+h4 { font-size: 20px; }
+h5 { font-size: 16px; }
+h6 { font-size: 13px; }
+h6 { letter-spacing: 0.08em; text-transform: uppercase; }
+p { margin: 0 0 var(--space-3); }
+a { color: var(--color-accent); text-underline-offset: 3px; }
+img { display: block; max-width: 100%; }
+figure { margin: 0; }
+figcaption {
+  font-size: 11px; margin-top: var(--space-1);
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+.text-muted { color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
+
+/* — rules — */
+.hr {
+  height: 1px; border: 0; margin: var(--space-4) 0;
+  background: var(--color-divider);
+}
+
+/* — buttons — */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer; text-decoration: none;
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 14px; line-height: 1.2; color: var(--color-text); /* matches the .input's 14px —
+     the pair sits side by side in sign-up rows */
+  background: transparent; border: 1px solid transparent;
+  padding: var(--space-2) calc(var(--space-3) * 1.2);
+  border-radius: var(--radius-md);
+}
+.btn svg { display: block; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { background: var(--color-accent); color: var(--color-bg); }
+.btn-primary:hover { background: var(--color-accent-600); }
+.btn-primary:active { background: var(--color-accent-700); }
+.btn-secondary { border-color: var(--color-divider); }
+.btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
+.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
+.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+.btn-ghost:active { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
+.btn-icon { width: 36px; height: 36px; padding: 0; }
+.btn-block { width: 100%; margin-top: var(--space-2); }
+
+/* — forms — */
+.field > label {
+  display: block; font-size: 12px; margin-bottom: 5px;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+}
+.input {
+  width: 100%; min-height: 36px; padding: 6px 10px; font: inherit;
+  font-size: 14px; color: var(--color-text); caret-color: var(--color-accent);
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+}
+.input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+.input:focus-visible { border-color: var(--color-accent); outline-offset: 0; }
+textarea.input { min-height: 90px; resize: vertical; }
+.radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+.radio input, .seg-opt input {
+  position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
+}
+.radio .dot {
+  width: 16px; height: 16px; flex: none; border-radius: 50%;
+  border: 1.5px solid var(--color-divider);
+}
+.radio:hover .dot { border-color: var(--color-accent); }
+.radio input:checked + .dot {
+  border-color: var(--color-accent); background: var(--color-accent);
+  box-shadow: inset 0 0 0 4px var(--color-bg);
+}
+.radio input:focus-visible + .dot { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.seg {
+  display: inline-flex; overflow: hidden;
+  border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+}
+.seg-opt {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; font-size: 13px; cursor: pointer;
+}
+.seg-opt + .seg-opt { border-left: 1px solid var(--color-divider); }
+.seg-opt:has(input:checked) { background: var(--color-accent); color: var(--color-bg); }
+.seg-opt:not(:has(input:checked)):hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.seg-opt:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+
+/* — cards — */
+.card {
+  display: flex; flex-direction: column; gap: var(--space-2);
+  padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface);
+}
+.card-kicker { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent); }
+.card-title {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 17px; line-height: 1.2;
+}
+.card-body { margin: 0; font-size: 13px; opacity: 0.8; flex: 1; }
+.card-meta {
+  display: flex; align-items: center; gap: 6px; font-size: 11px;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+}
+.elev-sm { box-shadow: var(--shadow-sm); }
+.elev-md { box-shadow: var(--shadow-md); }
+.elev-lg { box-shadow: var(--shadow-lg); }
+
+/* — tags — */
+.tag {
+  display: inline-flex; align-items: center; font-size: 11px;
+  letter-spacing: 0.02em; padding: 3px 10px;
+  border-radius: calc(var(--radius-md) * 0.75);
+}
+.tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
+.tag-accent-2 { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
+.tag-neutral { background: var(--color-neutral-100); color: var(--color-neutral-800); }
+.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
+
+/* — navigation — */
+.nav {
+  display: flex; align-items: center; gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: none;
+}
+.nav-brand {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 18px; margin-right: auto;
+}
+.nav a { color: inherit; text-decoration: none; font-size: 14px; }
+.nav a:hover, .nav a[aria-current='page'] { color: var(--color-accent); }
+
+/* — tables — */
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th {
+  text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  padding: var(--space-2); border-bottom: 1px solid var(--color-divider);
+}
+.table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+.table tbody tr:hover { background: color-mix(in srgb, var(--color-text) 4%, transparent); }
+
+/* — dialog — */
+.dialog-backdrop {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
+}
+.dialog {
+  width: min(440px, 100%); display: flex; flex-direction: column; gap: var(--space-3);
+  padding: var(--space-4); border-radius: var(--radius-lg);
+  background: var(--color-surface); box-shadow: var(--shadow-lg);
+}
+.dialog-title {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 20px;
+}
+.dialog-body { font-size: 14px; opacity: 0.85; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
+
+/* — blueprint frame: components are wireframe objects (see .blueprint
+     and .corner above) — square, transparent, hairline-bordered — */
+.card, .btn, .input, .tag, .seg, .dialog { border-radius: 0; }
+.card, .dialog { background: transparent; border: 1px solid var(--color-divider); }
+.btn { border: 1px solid var(--color-divider); }
+.btn-primary { border-color: var(--color-accent); }
+.btn-ghost { border-color: transparent; }
+
+
+html,body{background:transparent}
+
+  a { color: var(--color-accent); text-decoration: none; }
+  a:hover { color: var(--color-accent-700); text-decoration: underline; }
+
+</style>
+</head>
+<body style="margin:0">
+<div style="min-height: 100%; background-image: linear-gradient(color-mix(in srgb,var(--color-text) 4%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--color-text) 4%,transparent) 1px,transparent 1px); background-position-x: ; background-position-y: ; background-size: 30px 30px; background-repeat: ; background-attachment: ; background-origin: ; background-clip: ; background-color: ; padding: 44px 32px 72px; font-family: var(--font-body); color: var(--color-text);"><div style="max-width: 1200px; margin: 0px auto;">
+
+  
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; border-bottom: 1px solid var(--color-divider); padding-bottom: 18px; flex-wrap: wrap;">
+    <div>
+      <div style="font-family: var(--font-heading); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-accent);">Perivale Warehouse · Process map</div>
+      <h1 style="font-size: 44px; margin: 4px 0px 0px; letter-spacing: -0.02em;">Goods‑in to dispatch</h1>
+    </div>
+  </div>
+
+  
+  
+  <div class="blueprint" style="margin-top: 26px; padding: 16px 18px; background: var(--color-bg); display: flex; flex-wrap: wrap; gap: 26px; align-items: center;">
+    <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 55%,transparent);">System</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; background: var(--color-accent); color: var(--color-bg);">Colorama</span>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; background: var(--color-accent-700); color: var(--color-bg);">WMS</span>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">HHT</span>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; background: var(--color-accent-800); color: var(--color-bg);">KNAPP</span>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; background: var(--color-accent-600); color: var(--color-bg);">POD</span>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; border: 1px solid var(--color-neutral-500); color: var(--color-neutral-700);">Sales SOP · Website · Broadband</span>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; border: 1px solid var(--color-neutral-500); color: var(--color-neutral-700);">Customer Service SOP</span>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; border: 1px solid var(--color-neutral-500); color: var(--color-neutral-700);">WSC</span>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Paper / manual</span>
+    </div>
+    <div style="width: 1px; height: 22px; background: var(--color-divider);"></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; font-size: 11px; color: color-mix(in srgb,var(--color-text) 62%,transparent);">
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; border: 1px solid var(--color-divider); display: inline-block;"></span>Step</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border: 1.5px solid var(--color-accent); transform: rotate(45deg); display: inline-block;"></span>Decision</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; border: 1px dashed var(--color-accent); display: inline-block;"></span>Handled outside the flow</span>
+    </div>
+  </div>
+  
+
+  
+  <section style="margin-top: 34px;">
+    <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+      <span style="font-family: var(--font-heading); font-size: 36px; line-height: 0.9; color: var(--color-accent);">01</span>
+      <div style="flex: 1 1 0%;">
+        <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent);">Stage</div>
+        <h3 style="font-size: 24px; margin: 0px;">Goods in — receive &amp; make live</h3>
+      </div>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">HHT + WSC</span>
+    </div>
+    <div class="blueprint" style="padding: 16px; background: var(--color-bg);">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 9px;">
+        <div style="flex: 1 1 150px; min-width: 138px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">01.1</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Delivery arrives</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Stock received at Perivale goods in.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 138px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">01.2</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-neutral-500); color: var(--color-neutral-700);">WSC</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Check against paperwork</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Paperwork created &amp; sent by Stock Control India; team checks stock in.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 138px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">01.3</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-neutral-500); color: var(--color-neutral-700);">WSC</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Send to Stock Control</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Checked paperwork returned; Stock Control India inputs it into WSC.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 138px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">01.4</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not live</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Label &amp; accept</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Yellow labels printed &amp; applied. Accepted but not yet live in the system.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 138px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">01.5</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">HHT</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Put away</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Stock put away and a location allocated.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 138px; border: 1.5px solid var(--color-accent); background: color-mix(in srgb,var(--color-accent) 8%,transparent); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">01.6</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent); color: var(--color-bg);">Live</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Scan yellow label</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 68%,transparent);">Location allocated on scan — stock goes live in the system.</div>
+        </div>
+      </div>
+      <div style="margin-top: 11px; font-size: 10.5px; font-family: var(--font-heading); letter-spacing: 0.05em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 48%,transparent);">Detailed Goods In flow to follow — steps 01.1 to 01.3 are due for automation</div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-divider); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <div style="font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent); flex: 0 0 auto;">CI projects — automating this stage</div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Booking Slot System</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent); color: var(--color-bg);">Completed</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">SAT</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">In progress</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">New Product Introduction</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">In progress</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">HHT scanner tracking report</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Digitalization of the agency hours</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="display: flex; justify-content: center; padding: 6px 0px;"><div style="display: flex; flex-direction: column; align-items: center; height: 34px;"><div style="flex: 1 1 0%; border-left: 2px solid var(--color-accent);"></div><div style="width: 0px; height: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--color-accent);"></div></div></div>
+
+  
+  <section>
+    <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+      <span style="font-family: var(--font-heading); font-size: 36px; line-height: 0.9; color: var(--color-accent);">02</span>
+      <div style="flex: 1 1 0%;">
+        <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent);">Stage · put away</div>
+        <h3 style="font-size: 24px; margin: 0px;">Put away — where live stock is held</h3>
+      </div>
+    </div>
+    <div class="blueprint" style="padding: 16px; background: var(--color-bg);">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent); margin-bottom: 11px;">Stock is put away into one of →</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <div style="flex: 1 1 180px; min-width: 160px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Racking &amp; aisles</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">HHT</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Bulk stock upstairs in the aisles — the reserve replenishment is drawn from (KNAPP replenishment).</div>
+        </div>
+        <div style="flex: 1 1 180px; min-width: 160px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Manual picking</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">HHT</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Manual picking picks straight from these aisles; goes downstairs only if upstairs stock runs out.</div>
+        </div>
+        <div style="flex: 1 1 180px; min-width: 160px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Wholesale picking</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">HHT</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Wholesale picks the same way as manual — from these aisles, or from the downstairs location if not stocked upstairs.</div>
+        </div>
+        <div style="flex: 1 1 180px; min-width: 160px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Bottles area</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Paper</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Two dedicated aisles upstairs. Picked like manual &amp; wholesale, but with no scanner module — paper only.</div>
+        </div>
+        <div style="flex: 1 1 180px; min-width: 160px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Fridges — downstairs ×2</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Paper</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Chilled stock, direct put‑away. One fridge for picking, one for reserve.</div>
+        </div>
+        <div style="flex: 1 1 180px; min-width: 160px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">CD Vault</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Paper</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Separate secure area; put away by a designated person.</div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-divider); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <div style="font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent); flex: 0 0 auto;">CI projects — automating this stage</div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Stock Traceability</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent); color: var(--color-bg);">Completed</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Expiry Date visibility in reserve location</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">In progress</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">HHT scanner tracking report</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Digitalization of the agency hours</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="display: flex; justify-content: center; padding: 6px 0px;"><div style="display: flex; flex-direction: column; align-items: center; height: 34px;"><div style="flex: 1 1 0%; border-left: 2px solid var(--color-accent);"></div><div style="width: 0px; height: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--color-accent);"></div></div></div>
+
+  
+  <section>
+    <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+      <span style="font-family: var(--font-heading); font-size: 36px; line-height: 0.9; color: var(--color-accent);">03</span>
+      <div style="flex: 1 1 0%;">
+        <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent);">Stage</div>
+        <h3 style="font-size: 24px; margin: 0px;">Replenishment — demand check &amp; pick</h3>
+      </div>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">HHT</span>
+    </div>
+    <div class="blueprint" style="padding: 16px; background: var(--color-bg);">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 9px;">
+        <div style="flex: 1 1 150px; min-width: 140px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">03.1</span>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Review demand</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Auto‑demand driven — check the lines needing replenishment.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 160px; min-width: 150px; border: 1.5px solid var(--color-accent); background: color-mix(in srgb,var(--color-accent) 6%,transparent); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 9px; height: 9px; border: 1.5px solid var(--color-accent); transform: rotate(45deg); display: inline-block;"></span><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--color-accent);">Decision</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Pick location status?</div>
+          <div style="font-size: 11px; line-height: 1.35; display: flex; flex-direction: column; gap: 2px; color: color-mix(in srgb,var(--color-text) 66%,transparent);"><span>◆ Empty → raise demand</span><span>◆ Still full → no demand ↩</span></div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 140px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">03.2</span>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Scan barcode &amp; add qty</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Scan the location barcode; enter demand and quantity on the scanner.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 160px; min-width: 150px; border: 1.5px solid var(--color-accent); background: color-mix(in srgb,var(--color-accent) 6%,transparent); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 9px; height: 9px; border: 1.5px solid var(--color-accent); transform: rotate(45deg); display: inline-block;"></span><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--color-accent);">Decision</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Demand size?</div>
+          <div style="font-size: 11px; line-height: 1.35; display: flex; flex-direction: column; gap: 2px; color: color-mix(in srgb,var(--color-text) 66%,transparent);"><span>◆ Full pallet+ → pick</span><span>◆ Under a pallet → pick</span></div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 140px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">03.3</span>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Pick &amp; hand over</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Collect boxes &amp; pallet, pick the demand, deliver to the reserved area &amp; hand to take‑out.</div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-divider); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <div style="font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent); flex: 0 0 auto;">CI projects — automating this stage</div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Auto demand</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">Ready for go‑live</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">HHT scanner tracking report</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Digitalization of the agency hours</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="display: flex; justify-content: center; padding: 6px 0px;"><div style="display: flex; flex-direction: column; align-items: center; height: 34px;"><div style="flex: 1 1 0%; border-left: 2px solid var(--color-accent);"></div><div style="width: 0px; height: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--color-accent);"></div></div></div>
+
+  
+  <section>
+    <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+      <span style="font-family: var(--font-heading); font-size: 36px; line-height: 0.9; color: var(--color-accent);">04</span>
+      <div style="flex: 1 1 0%;">
+        <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent);">Stage</div>
+        <h3 style="font-size: 24px; margin: 0px;">Replenishment — take‑out to pick face</h3>
+      </div>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">HHT</span>
+    </div>
+    <div class="blueprint" style="padding: 16px; background: var(--color-bg);">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 9px; margin-bottom: 14px;">
+        <div style="flex: 1 1 150px; min-width: 140px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">04.1</span>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Take‑out from racking</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Live stock pulled from upstairs racking.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 140px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">04.2</span>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Scan into staging</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Temporary transit location so the move is tracked.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 140px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">04.3</span>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Move downstairs</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Scanned into its final downstairs location.</div>
+        </div>
+      </div>
+      <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent); margin-bottom: 10px;">Lands in one of →</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <div style="flex: 1 1 200px; min-width: 170px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Reserve downstairs</span>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Overflow storage below the pick face.</div>
+        </div>
+        <div style="flex: 1 1 200px; min-width: 170px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">KNAPP pick locations</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent-800); color: var(--color-bg);">KNAPP</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Picked for orders under 50 units.</div>
+        </div>
+        <div style="flex: 1 1 200px; min-width: 170px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">KNAPP A‑frame refill</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent-800); color: var(--color-bg);">KNAPP</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">One person, full 8‑hour shift, refilling the A‑frame from manual KNAPP locations.</div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-divider); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <div style="font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent); flex: 0 0 auto;">CI projects — automating this stage</div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Stock Traceability</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent); color: var(--color-bg);">Completed</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Expiry Date visibility in reserve location</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">In progress</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">HHT scanner tracking report</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Digitalization of the agency hours</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="display: flex; justify-content: center; padding: 6px 0px;"><div style="display: flex; flex-direction: column; align-items: center; height: 34px;"><div style="flex: 1 1 0%; border-left: 2px solid var(--color-accent);"></div><div style="width: 0px; height: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--color-accent);"></div></div></div>
+
+  
+  <section>
+    <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+      <span style="font-family: var(--font-heading); font-size: 36px; line-height: 0.9; color: var(--color-accent);">05</span>
+      <div style="flex: 1 1 0%;">
+        <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent);">Stage · demand trigger</div>
+        <h3 style="font-size: 24px; margin: 0px;">Order intake</h3>
+      </div>
+      <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+        <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; border: 1px solid var(--color-neutral-500); color: var(--color-neutral-700);">Sales SOP · Website · Broadband</span>
+        <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; background: var(--color-accent); color: var(--color-bg);">Colorama</span>
+      </div>
+    </div>
+    <div class="blueprint" style="padding: 16px; background: var(--color-bg);">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 9px;">
+        <div style="flex: 1 1 260px; min-width: 200px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">05.1</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 6px; border: 1px solid var(--color-neutral-500); color: var(--color-neutral-700);">Sales SOP · Website · Broadband</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Customer places order</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Placed via Sales SOP, the website, or Broadband.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 260px; min-width: 200px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">05.2</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent); color: var(--color-bg);">Colorama</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Order number raised</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Colorama holds all orders, stock &amp; locations; the order routes by type ↓.</div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; padding: 11px 13px; border: 1px dashed var(--color-accent); background: color-mix(in srgb,var(--color-accent) 5%,transparent); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.09em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-neutral-500); color: var(--color-neutral-700); flex: 0 0 auto;">Customer Service SOP</span>
+        <span style="font-family: var(--font-heading); font-weight: 600; font-size: 13px; flex: 0 0 auto;">Returns, RMAs &amp; customer queries</span>
+        <span style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent); flex: 1 1 240px;">Not part of the order flow — if a return or RMA is raised, or a customer query comes in, the Customer Service team handles it under the Customer Service SOP.</span>
+      </div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-divider); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <div style="font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent); flex: 0 0 auto;">CI projects — automating this stage</div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Scanned Parcel ‑ 1021</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-700);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Non‑RMA Query Logging System Update</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent); color: var(--color-bg);">Completed</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Customer Onboarding tool</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">In progress</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">RMA Code changing</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Claims &amp; Returns RMA Dashboard</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="display: flex; justify-content: center; padding: 6px 0px;"><div style="display: flex; flex-direction: column; align-items: center; height: 34px;"><div style="flex: 1 1 0%; border-left: 2px solid var(--color-accent);"></div><div style="width: 0px; height: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--color-accent);"></div></div></div>
+
+  
+  <section>
+    <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+      <span style="font-family: var(--font-heading); font-size: 36px; line-height: 0.9; color: var(--color-accent);">06</span>
+      <div style="flex: 1 1 0%;">
+        <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent);">Stage · splits into by order type</div>
+        <h3 style="font-size: 24px; margin: 0px;">Picking</h3>
+      </div>
+    </div>
+    <div class="blueprint" style="padding: 16px; background: var(--color-bg);">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent); margin-bottom: 11px;">Routed to a picking area by order type →</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <div style="flex: 1 1 220px; min-width: 180px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">KNAPP</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent-800); color: var(--color-bg);">KNAPP</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Orders under 50 units (not cold chain). A‑frame + manual bays — detailed below.</div>
+        </div>
+        <div style="flex: 1 1 220px; min-width: 180px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Manual picking</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">HHT</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Orders of 50 units &amp; up, picked from upstairs for next‑day delivery.</div>
+        </div>
+        <div style="flex: 1 1 220px; min-width: 180px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Wholesale</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">HHT</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Picked from upstairs, pre‑picked in advance.</div>
+        </div>
+        <div style="flex: 1 1 220px; min-width: 180px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Bottles</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Paper</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Paper pick from the bottles area.</div>
+        </div>
+        <div style="flex: 1 1 220px; min-width: 180px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Fridges</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Paper</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Chilled orders — one fridge picks, one holds reserve.</div>
+        </div>
+        <div style="flex: 1 1 220px; min-width: 180px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">CD Vault</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Paper</span></div>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Paper pick.</div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-divider); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <div style="font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent); flex: 0 0 auto;">CI projects — automating this stage</div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Stock Traceability</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent); color: var(--color-bg);">Completed</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Manual Bundling Phase 3</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">In progress</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Expiry Date visibility in reserve location</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">In progress</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">HHT scanner tracking report</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Digitalization of the agency hours</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="display: flex; justify-content: center; padding: 6px 0px;"><div style="display: flex; flex-direction: column; align-items: center; height: 34px;"><div style="flex: 1 1 0%; border-left: 2px solid var(--color-accent);"></div><div style="width: 0px; height: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--color-accent);"></div></div></div>
+
+  
+  <section>
+    <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+      <span style="font-family: var(--font-heading); font-size: 36px; line-height: 0.9; color: var(--color-accent);">07</span>
+      <div style="flex: 1 1 0%;">
+        <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent);">Stage · detail of KNAPP lane</div>
+        <h3 style="font-size: 24px; margin: 0px;">KNAPP picking</h3>
+      </div>
+      <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; background: var(--color-accent-800); color: var(--color-bg);">KNAPP → Colorama → WMS</span>
+    </div>
+    <div class="blueprint" style="padding: 16px; background: var(--color-bg);">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 9px;">
+        <div style="flex: 1 1 150px; min-width: 140px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">07.1</span>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">A‑frame refilled</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Product pre‑loaded into the A‑frame by replenishment.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 140px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">07.2</span>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">A‑frame drops</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Automated portion drops into the order box as it travels.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 140px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">07.3</span>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Manual bays</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Box travels on; picker adds any remaining manual lines.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 160px; min-width: 150px; border: 1.5px solid var(--color-accent); background: color-mix(in srgb,var(--color-accent) 6%,transparent); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 9px; height: 9px; border: 1.5px solid var(--color-accent); transform: rotate(45deg); display: inline-block;"></span><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--color-accent);">Decision</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">All lines picked?</div>
+          <div style="font-size: 11px; line-height: 1.35; display: flex; flex-direction: column; gap: 2px; color: color-mix(in srgb,var(--color-text) 66%,transparent);"><span>◆ Yes → close box</span><span>◆ Issue → issue station</span></div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 150px; min-width: 140px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">07.4</span>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Invoice &amp; close</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Invoice printed, box closed, carries on to dispatch.</div>
+        </div>
+      </div>
+      <div style="margin-top: 11px; font-size: 10.5px; font-family: var(--font-heading); letter-spacing: 0.05em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 48%,transparent);">↩ Issue station reviews why a line was missed, then rejoins the flow</div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-divider); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <div style="font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent); flex: 0 0 auto;">CI projects — automating this stage</div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">KNAPP Picker Performance Dashboard</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">HHT scanner tracking report</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Digitalization of the agency hours</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="display: flex; justify-content: center; padding: 6px 0px;"><div style="display: flex; flex-direction: column; align-items: center; height: 34px;"><div style="flex: 1 1 0%; border-left: 2px solid var(--color-accent);"></div><div style="width: 0px; height: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--color-accent);"></div></div></div>
+
+  
+  <section>
+    <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+      <span style="font-family: var(--font-heading); font-size: 36px; line-height: 0.9; color: var(--color-accent);">08</span>
+      <div style="flex: 1 1 0%;">
+        <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent);">Stage · merges to dispatch</div>
+        <h3 style="font-size: 24px; margin: 0px;">Pack &amp; label</h3>
+      </div>
+    </div>
+    <div class="blueprint" style="padding: 16px; background: var(--color-bg);">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <div style="flex: 1 1 240px; min-width: 200px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Manual / KNAPP repack</span>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Parcels packed &amp; labelled, then to dispatch.</div>
+        </div>
+        <div style="flex: 1 1 240px; min-width: 200px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Wholesale</span>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Packed after picking, then taken downstairs on the delivery date.</div>
+        </div>
+        <div style="flex: 1 1 240px; min-width: 200px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">Dispatch — CD area</span>
+          <div style="font-size: 11.5px; line-height: 1.35; color: color-mix(in srgb,var(--color-text) 62%,transparent);">Packed in the vault.</div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-divider); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <div style="font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent); flex: 0 0 auto;">CI projects — automating this stage</div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">HHT scanner tracking report</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Digitalization of the agency hours</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="display: flex; justify-content: center; padding: 6px 0px;"><div style="display: flex; flex-direction: column; align-items: center; height: 34px;"><div style="flex: 1 1 0%; border-left: 2px solid var(--color-accent);"></div><div style="width: 0px; height: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--color-accent);"></div></div></div>
+
+  
+  <section>
+    <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+      <span style="font-family: var(--font-heading); font-size: 36px; line-height: 0.9; color: var(--color-accent);">09</span>
+      <div style="flex: 1 1 0%;">
+        <div style="font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: color-mix(in srgb,var(--color-text) 50%,transparent);">Stage</div>
+        <h3 style="font-size: 24px; margin: 0px;">Dispatch</h3>
+      </div>
+      <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+        <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; background: var(--color-accent-700); color: var(--color-bg);">WMS</span>
+        <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; background: var(--color-accent-600); color: var(--color-bg);">POD</span>
+      </div>
+    </div>
+    <div class="blueprint" style="padding: 16px; background: var(--color-bg);">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 9px;">
+        <div style="flex: 1 1 200px; min-width: 180px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">09.1</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent-700); color: var(--color-bg);">WMS</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Scan boxes to route</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 58%,transparent);">Boxes segregated one pallet per route.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; flex: 0 0 14px; color: var(--color-accent); font-size: 18px;">→</div>
+        <div style="flex: 1 1 200px; min-width: 180px; border: 1.5px solid var(--color-accent); background: color-mix(in srgb,var(--color-accent) 8%,transparent); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;"><span style="font-family: var(--font-heading); font-size: 9.5px; letter-spacing: 0.09em; color: var(--color-accent);">09.2</span><span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent-600); color: var(--color-bg);">POD</span></div>
+          <div style="font-family: var(--font-heading); font-weight: 600; font-size: 15px; line-height: 1.1;">Driver loads &amp; departs</div>
+          <div style="font-size: 11px; line-height: 1.3; color: color-mix(in srgb,var(--color-text) 68%,transparent);">Driver scans the route, scans each box into the van via the POD app — and it goes.</div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-divider); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <div style="font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent); flex: 0 0 auto;">CI projects — automating this stage</div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">POD Split Route</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent); color: var(--color-bg);">Completed</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Route Planner</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-accent); color: var(--color-bg);">Completed</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Daily Vehicle inspection check</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; border: 1px solid var(--color-accent); color: var(--color-accent-700);">In progress</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Ops KPI Report (Excel, Perivale drive)</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-700);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Transport AI Supported Fleet Maintenance Tool</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Predictive / planned maintenance tool (Warehouse)</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">HHT scanner tracking report</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-divider); background: var(--color-bg); padding: 6px 10px;">
+          <span style="font-family: var(--font-heading); font-weight: 600; font-size: 12px;">Digitalization of the agency hours</span>
+          <span style="font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-800);">Not started</span>
+        </div>
+      </div>
+    </div>
+  </section></div></div>
+<template id="__bundler_thumbnail" data-bg-color="#f2f2f3"><svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg"><rect width="1200" height="800" fill="#f2f2f3"/><g fill="none" stroke="#5980a6" stroke-width="10"><rect x="150" y="300" width="230" height="200"/><rect x="485" y="300" width="230" height="200"/><rect x="820" y="300" width="230" height="200"/><path d="M380 400h105M715 400h105"/></g></svg></template>
+</body>
+</html>
